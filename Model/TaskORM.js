@@ -1,12 +1,11 @@
-let ose = require('mongoose');
-
+let ose = require("mongoose");
 // 先创建文档，再生成ORM对象
 let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectId
     caption:{ //  任务标题
         type:String,
         //required: true
     },
-    price:{ // 赏金
+    award:{ // 赏金
         type:Number,
         //required: true
     },
@@ -14,29 +13,35 @@ let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectI
         type:String,
     },
     publisher:{
-        type: ObjectId,
+        type: ose.Schema.Types.ObjectId
         //required:true
     },
     hunter:{
-        type: ObjectId,
+        type: ose.Schema.Types.ObjectId,
+        //ref: 'User'  // 查询时使用 .populate(field) 即可将次字段填充为全部信息
     },
-    startloc:{
+    taskloc:{ // 任务地点
         type: String,
-        
+        //ref: 'User'
     },
     endloc:{
         type: String
     },
     // 联系方式(默认为用户信息里的？)
+    starttime:{
+        type:Date,
+        default:Date.now
+    },
     endtime:{
         type: Date
     },
-    close:{ // 未完成 已完成 (已关闭要不要？)
-        type:Boolean
+    status:{ // 0:未完成 1:正在执行 2:已完成
+        type: Number,
+        default: 0
     }
 });
 // 字段类型都有： 
 // String, Number, Date, Buffer, Booleanm Mixed, ObjectId, Array
 
 let TaskORM = ose.model('Task', TaskSchema);
-module.exports = DishORM;
+module.exports = TaskORM;

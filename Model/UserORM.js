@@ -20,26 +20,28 @@ let UserScema = new ose.Schema({
     verifyed:{
         type:Boolean
     },
-    publish:[{
+    published:[{
         id:{
-            type: ObjectId
+            type: ose.Schema.Types.ObjectId,
+            //ref: 'Task'
         },
         caption:{
             type:String
         },
-        close:{
-            type:Boolean
+        status:{
+            type:Number
         }
     }],
     hunted:[{
         id:{
-            type: ObjectId
+            type: ose.Schema.Types.ObjectId,
+           // ref: 'Task'
         },
         caption:{
             type:String
         },
-        close:{
-            type:Boolean
+        status:{
+            type:Number
         }
     }]
 });
