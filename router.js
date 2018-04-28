@@ -12,12 +12,14 @@ router.post('/tasks', Task.add);
 
 router.get('/tasks', Task.queryAll);
 router.get('/tasks/:orderby.:method', Task.queryAll); // 所有任务(按距离或赏金排序)
-router.get('/tasks/:as/:user_id', User.queryTaskByUser); // as hunter or sheriff
+router.get('/tasks/:as/:user_id', Task.queryByUser); // as hunter or publisher
 
-router.get('/task/:task_id', Task.queryOne); // 任务详情页
+router.get('/tasks/:task_id', Task.queryOne); // 任务详情页
 
+
+router.put('/tasks/:task_id', Task.update); // 全部都可更新
 // TODO: PUT 连不上？！
-router.put('/tasks/：task_id/:verb/:by', Task.update); // 更新任务：主要被领取、完成 时
+// router.put('/tasks/:verb/：task_id', Task.updateStatus); // 更新任务：主要被领取、完成 时
 router.delete('/tasks/:task_id', Task.delete); // task 被sheriff主动删除时
 
 module.exports = router;

@@ -20,30 +20,18 @@ let UserScema = new ose.Schema({
     verifyed:{
         type:Boolean
     },
-    published:[{
+    /*published:[{
         id:{
             type: ose.Schema.Types.ObjectId,
             //ref: 'Task'
-        },
-        caption:{
-            type:String
-        },
-        status:{
-            type:Number
         }
     }],
     hunted:[{
         id:{
             type: ose.Schema.Types.ObjectId,
            // ref: 'Task'
-        },
-        caption:{
-            type:String
-        },
-        status:{
-            type:Number
         }
-    }]
+    }]*/
 });
 
 let User = ose.model('User', UserScema);
