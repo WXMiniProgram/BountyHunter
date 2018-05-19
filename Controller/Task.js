@@ -13,13 +13,13 @@ module.exports.queryAll  = (req, res)=>{ // query all infos from all datas
     }
     /*if(field == "distance"){
 
-    }*/
+    }*/ 
     Task.find().sort(option).exec((err, result)=>{
         if(err){
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result": result})
+        res.status(200).json({"result": result});
     })
 }
 
@@ -28,11 +28,11 @@ module.exports.queryOne = (req, res)=>{
     let params = req.params,
         id = params["task_id"];
     Task.findById(id, (err, task)=>{
-        if(err){
+        if(err || !util.isValid(task)){
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result": task});
+        res.status(200).json({"result": task}); // 未找到时返回null
     })
 }
 
@@ -80,18 +80,18 @@ module.exports.updateStatus = (req, res)=>{
         task_id = params["task_id"];
     let verb = body["verb"];
     let info = {}
-    if(verb == "cancel"){
+    if(verb == "cancel"){ // 撤销
         info["status"] = 0; // 更改状态
         info["hunter"] = null;
-    }else if(verb == "get"){
+    }else if(verb == "get" && info["staus"] == 0 && info["hunter"]){ // 领取任务 (之前任务状态必须是0 且必须存在hunter)
         try{
             info["status"] = 1;
-            info["hunter"] = ose.Types.ObjectId(body["hunter"]);
+            info["hunter"] = ose.Types.ObjectId(body["hunter"] ? body["hunter"]: null);
         }catch(err){
             res.status(400).json(util.errObj(ErrMsg["format"]));
             return ;
         }
-    }else if(verb == "done"){
+    }else if(verb == "done"){ // 确认完成
         info["status"] = 2;
     }else{
         res.status(400).json(util.errObj(util.ErrMsg["format"]));
@@ -131,14 +131,14 @@ module.exports.add = (req, res)=>{
 
     if( util.isValid(body["publisher"])
         && util.isValid(body["caption"])
-        && util.isValid(body["award"])
+        // && util.isValid(body["award"]) 不一定非有赏金 默认为0
         && util.isValid(body["taskloc"]) //  && util.isValid(body["endloc"] => 任务结束地点也可以没有
        ) // && util.isValid(body["endtime"])  => 结束时间可以没有
         {
             let task = new Task({
                 "publisher": ose.Types.ObjectId(body["publisher"]),
                 "caption": body["caption"],
-                "award": body["award"],
+                "award": body["award"] ? body["award"] : 0,
                 "discription": body["discription"],
                 "hunter": null,
                 "taskloc": body["taskloc"],

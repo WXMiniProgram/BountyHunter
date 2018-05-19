@@ -11,6 +11,10 @@ let UserScema = new ose.Schema({
         type:String,
 
     },*/
+    _id:{
+        type: ose.Schema.Types.ObjectId
+        // index?
+    },
     reputation:{
         type:Number
     },
@@ -20,18 +24,9 @@ let UserScema = new ose.Schema({
     verifyed:{
         type:Boolean
     },
-    /*published:[{
-        id:{
-            type: ose.Schema.Types.ObjectId,
-            //ref: 'Task'
-        }
-    }],
-    hunted:[{
-        id:{
-            type: ose.Schema.Types.ObjectId,
-           // ref: 'Task'
-        }
-    }]*/
+    img_path:{ // 认证图片
+        type:String
+    }
 });
 
 let User = ose.model('User', UserScema);

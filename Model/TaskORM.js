@@ -21,13 +21,20 @@ let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectI
         //ref: 'User'  // 查询时使用 .populate(field) 即可将次字段填充为全部信息
     },
     taskloc:{ // 任务地点
-        type: String,
+        longitude:{
+            type: Number
+        },
+        latitude:{
+            type: Number
+        },
+        name:{ // 地址名称
+            type: String
+        },
+        address:{ // 详细地址
+            type: String
+        }
         //ref: 'User'
     },
-    endloc:{
-        type: String
-    },
-    // 联系方式(默认为用户信息里的？)
     starttime:{
         type:Date,
         default:Date.now
@@ -39,6 +46,21 @@ let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectI
         type: Number,
         default: 0
     }
+    /*endloc:{
+        longitude:{
+            type: Number
+        },
+        latitude:{
+            type: Number
+        },
+        name:{ // 地址名称
+            type: String
+        },
+        address:{ // 详细地址
+            type: String
+        }
+    },*/
+    // 联系方式(默认为用户信息里的？)
 });
 // 字段类型都有： 
 // String, Number, Date, Buffer, Booleanm Mixed, ObjectId, Array
