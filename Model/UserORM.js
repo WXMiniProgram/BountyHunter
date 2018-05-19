@@ -2,30 +2,36 @@ let ose = require('mongoose');
 
 
 let UserScema = new ose.Schema({
-    /*username:{
-        type: String,
-        required:true,
-        index:{unique: true}
-    },
-    password:{
-        type:String,
-
-    },*/
     _id:{
         type: ose.Schema.Types.ObjectId
-        // index?
     },
-    reputation:{
-        type:Number
+    username:{
+        type:String,
+        default: ""
     },
-    contact:{
-        type: String
+    name:{
+        type: String,
+        default: ""
     },
     verifyed:{
-        type:Boolean
+        type:Boolean,
+        default:false
     },
-    img_path:{ // 认证图片
-        type:String
+    avatar:{
+        type:String,
+        default: ""
+    },
+    school: {
+        type:String,
+        default: ""
+    },
+    school_id: {
+        type: Number,
+        default: null
+    },
+    img:{ // 认证图片
+        type:String,
+        default: ""
     }
 });
 

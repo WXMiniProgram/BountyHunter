@@ -3,13 +3,17 @@ let hbs = require('hbs');
 let app = express();
 let router = require('./router');
 let ose = require('mongoose');
-let bodyParser = require('body-parser');
+let path = require("path");
+let bodyParser = require("body-parser");
+let fileupload = require("express-fileupload");
 
 // app.set('views', './templates'); // 纯后台 不需要视图层了
 // app.set('view engine', 'html');
 // app.engine('html', hbs.__express);
 
 app.use(bodyParser.json());
+app.use(fileupload());
+// app.use(bodyParser.urlencoded({uploadDir: path.join(__dirname, 'statics', 'users')}));
 app.use('/', router); // 将router挂载到根目录访问
 app.use(express.static('statics'));
 
