@@ -43,14 +43,13 @@ module.exports.login = (req, res)=>{
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
         }
     })*/
-    let params = req.params,
-        body = req.body;
+    let body = req.body;
     let url = "https://api.weixin.qq.com/sns/jscode2session",
         req_params = {
             "grant_type": "authorization_code",
             "js_code": body["code"],
         };
-    util.WXRequest(url, req_params, (result)=>{ // 最基础的数据包(不管有没有 unionID)                不要删这一大段注释！！！！！！！！！
+    util.WXRequest(url, req_params, (result)=>{ // 最基础的数据包(不管有没有 unionID)
         this.CheckAndReg(result.open_id, (user)=>{
             if(user){
                 res.status(200).json({"result": wrapDTO(user)});

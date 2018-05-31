@@ -1,7 +1,7 @@
-let request = require("request")
+let request = require("request");
 let config = require("config");
-let appID = "wx750215304d97dc16	"
-let appSecret = ""
+let appID = "wx750215304d97dc16	";
+let appSecret = "";
 
 
 let ErrMsg = {
@@ -24,10 +24,17 @@ module.exports.errObj = (msg)=>{
 module.exports.WXRequest = (url, params, success, err)=>{
     params["appid"] = appID;
     params["secret"] = appSecret;
+    let GET_param = "?";
+    for (let key in params)
+        GET_param = GET_param +key+"="+params[key];
+    url += GET_param;
     let options = {
-        "url": url,
-        "method": "POST",
+        "uri": url,
+        "method": "GET",
     }
+    request(options, (err, response, body)=>{
+        console.log(body);
+    })
 }
 
 module.exports.StoreFile = (id, suffix, file, func, err_cb)=>{ // type: avatar or img
