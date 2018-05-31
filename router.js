@@ -18,7 +18,7 @@ router.put('/tasks/:task_id', Task.update); // 全部都可更新
 // router.put('/tasks/:verb/：task_id', Task.updateStatus); // 更新任务：主要被领取、完成 时
 router.delete('/tasks/:task_id', Task.delete); // task 被sheriff主动删除时
 
-router.post('/user/login', User.login);
+router.post('/user/login/:code', User.login);
 router.put('/user/pass/:openid', User.pass);
 router.put('/user/reject/:openid', User.reject);
 router.put('/user/uploadImg/:openid', User.uploadImg);

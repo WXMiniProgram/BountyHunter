@@ -18,7 +18,7 @@ app.use('/', router); // 将router挂载到根目录访问
 app.use(express.static('statics'));
 
 
-let db_addr = 'mongodb://127.0.0.1:27017/dish' // 地址从命令行里打开 mongo就可看到  dish 为数据库名 格式：'mongodb://user:pass@localhost:port/database'
+let db_addr = 'mongodb://127.0.0.1:27017/WxHelper' // 地址从命令行里打开 mongo就可看到  dish 为数据库名 格式：'mongodb://user:pass@localhost:port/database'
 ose.connect(db_addr);
 ose.connection.once('open', ()=>{
     // ?

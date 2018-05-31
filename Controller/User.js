@@ -35,15 +35,16 @@ function CheckAndReg(id, func){ // 查找指定id 的用户
 }
 
 module.exports.login = (req, res)=>{
-    CheckAndReg("41224d776a326fb40f000001", (user)=>{
+    // let code = req.params["code"];
+    /*CheckAndReg("41224d776a326fb40f000001", (user)=>{
         if(user){
             res.status(200).json({"result": wrapDTO(user)});
         }else{
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
         }
-    })
-    /*let params = req.params,
-        body = req.bodybody;
+    })*/
+    let params = req.params,
+        body = req.body;
     let url = "https://api.weixin.qq.com/sns/jscode2session",
         req_params = {
             "grant_type": "authorization_code",
@@ -57,7 +58,7 @@ module.exports.login = (req, res)=>{
                 res.status(404).json(util.errObj(util.ErrMsg["404"]));
             }
         });
-    })*/
+    });
  // 登录的接口地址：
  // https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code     
 }
