@@ -16,7 +16,7 @@ router.get('/tasks/:as/:user_id', Task.queryByUser); // as hunter or publisher
 router.post('/tasks/:task_id', Task.update); // 全部都可更新
 // TODO: PUT 连不上？！
 // router.put('/tasks/:verb/：task_id', Task.updateStatus); // 更新任务：主要被领取、完成 时
-router.delete('/tasks/:task_id', Task.delete); // task 被sheriff主动删除时
+router.post('/tasks/delete/:task_id', Task.delete); // task 被sheriff主动删除时
 
 router.get('/user/login/:code', User.login);
 router.post('/user/pass/:openid', User.pass);

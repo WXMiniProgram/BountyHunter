@@ -9,15 +9,35 @@ let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectI
         type:Number,
         //required: true
     },
-    discription:{ // 描述
+    description:{ // 描述
         type:String,
     },
+    hiddenMsg: {
+        type: String
+    },
     publisher:{
-        type: ose.Schema.Types.ObjectId
+        publisher_openid: {
+            type: String
+        },
+        publisher_username: {
+            type: String
+        },
+        publisher_avatar: {
+            type: String        
+        }
         //required:true
     },
     hunter:{
-        type: ose.Schema.Types.ObjectId,
+        
+        hunter_openid: {
+            type: String
+        },
+        hunter_username: {
+            type: String
+        },
+        hunter_avatar: {
+            type: String  
+        }
         //ref: 'User'  // 查询时使用 .populate(field) 即可将次字段填充为全部信息
     },
     taskloc:{ // 任务地点
@@ -28,7 +48,7 @@ let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectI
             type: Number
         },
         name:{ // 地址名称
-            type: String
+          type: String
         },
         address:{ // 详细地址
             type: String

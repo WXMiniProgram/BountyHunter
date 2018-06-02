@@ -72,6 +72,7 @@ module.exports.verify = (req, res)=>{ // 含有头像 认证图片在用户选�
         res.status(401).json(util.errObj(util.ErrMsg["format"]));
     }
  //   util.StoreFile(id, "_avatar", avatar, (path)=>{
+    console.log("verify: ", body);
         let updates = {
             "username": body["username"],
             "name":body["name"],
@@ -80,7 +81,8 @@ module.exports.verify = (req, res)=>{ // 含有头像 认证图片在用户选�
             "school_id": body["school_id"],
             "avatar": body["avatar"] // 既然路径是固定的 那么只存名字就可以了
         }
-        User.find({"openid":openid}, (err, user)=>{
+        User.find({"openid":openid}, (err, users)=>{
+           let user = users[0];
            if(err || !util.isValid(user)){
                 res.status(404).json(util.errObj(util.ErrMsg["404"]));
             }
@@ -102,8 +104,10 @@ module.exports.verify = (req, res)=>{ // 含有头像 认证图片在用户选�
 module.exports.uploadImg = (req, res)=>{ // 上传学生证照片
     let img = req.files.img,
       openid = req.params["openid"];
+    console.log("img path", img);
     util.StoreFile(openid, "_img", img, (path)=>{
-        User.find({"openid":openid}, (err, user)=>{
+        User.find({"openid":openid}, (err, users)=>{
+           let user = users[0];
            if(err || !util.isValid(user)){
                 res.status(404).json(util.errObj(util.ErrMsg["404"]));
             }
@@ -126,8 +130,9 @@ module.exports.query = (req, res)=>{
 
 module.exports.queryOne = (req, res)=>{
     let params = req.params;
-    let id = params["openid"];
-    User.findById(id, (err, user)=>{
+    let openid = params["openid"];
+    User.find({"openid": openid}, (err, users)=>{
+        let user = users[0];
         if(err || !util.isValid(user)){
             res.status(404).json(util.ErrMsg["404"]);
         }
@@ -136,40 +141,41 @@ module.exports.queryOne = (req, res)=>{
 }
 
 module.exports.pass = (req, res)=>{ // 专门用来通过审核的
-    let id = req.params["openid"];
-    User.findByIdAndUpdate(id, {"verifyed": true}, (err, user)=>{
-        if(err || !user){
-            res.status(404).json(util.errObj(util.ErrMsg["404"]))
-        }
-        res.status(200).json({"result": user});
+    let openid = req.params["openid"];
+    User.find({"openid": openid}, (err, users)=>{
+        let user = users[0];
+        if(err || !user){}
+        user.verifyed = true;
+        user.save();
+        res.status(200).json({"result":user});
     })
 }
 
 module.exports.reject = (req, res)=>{
-    let id = req.params["openid"],
-        updates = {
-            "verify": false,
-            "img": "",
-            "name": "",
-            "school": "",
-            "school_id": ""
-        };
-    User.findByIdAndUpdate(id, updates, (err, user)=>{
+    let openid = req.params["openid"];
+    User.find({"openid": openid}, (err, users)=>{
+        let user = users[0];
         if(err || !user){
             res.status(404).json(util.errObj(util.ErrMsg["404"]))
         }
-        res.status(200).json({"result": user});
+        user.verifyed = false;
+        user.img="";
+        user.name="";
+        user.school="";
+        user.school_id="";
+        user.save();
+        res.status(200).json({"result":user});
     })
 }
 
 module.exports.update = (req, res)=>{ // 荣誉值、联系方式、审核状态
     let params = req.params,
         body = req.body; // 这么写有可能会存一堆垃圾信息
-    let id = params["openid"];
-    User.findByIdAndUpdate(id, body, (err, user)=>{
+    let openid = params["openid"];
+    User.find({"openid":openid}, (err, users)=>{
+        let user = users[0];
         if(err || !util.isValid(user))
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
-        res.status(200).json({"result": user});
-    })
-
+        user.save();
+    });
 }

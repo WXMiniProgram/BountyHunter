@@ -2,8 +2,24 @@ let ose = require("mongoose");
 let Task = require("../Model/TaskORM");
 let util = require("../util");
 
+function wrapTaskDTO(task){
+    if(typeof task == typeof []){}
+    else if(typeof task == typeof {}){}
+    else return task
+
+    console.log(task)
+    let dto = {};
+    dto["caption"] = task["caption"];
+    dto["bounty"] = task.award;
+    dto["endtime"] = task.endtime;
+    dto["taskloc"] = task.taskloc;
+    dto["description"] = task.description;
+    dto["publisher"] = task.publisher;
+    return dto;
+}
+
 module.exports.queryAll  = (req, res)=>{ // query all infos from all datas
-    console.log("queryAll: ", req.params);
+    console.log("Query ALL");
     let params = req.params; // orderby: distance or award
     let field = params["orderby"], // 排序字段
         method = params["method"],
@@ -15,11 +31,18 @@ module.exports.queryAll  = (req, res)=>{ // query all infos from all datas
 
     }*/ 
     Task.find().sort(option).exec((err, result)=>{
+        console.log("result： ", result)
         if(err){
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result": result});
+        r = []
+	console.log(typeof result == typeof []);
+        for( t in result){
+            r.push(wrapTaskDTO(t));
+        }
+        console.log("type:" , typeof result);
+        res.status(200).json({"result": r});
     })
 }
 
@@ -39,9 +62,10 @@ module.exports.queryOne = (req, res)=>{
 module.exports.queryByUser = (req, res)=>{
     let params = req.params,
         role = params["as"], // publisher or hunter
-        id = params["user_id"],
+        user_id = params["user_id"],
         filter = {};
-    filter[role] = ose.Types.ObjectId(id);
+    filter[role] = {};
+    filter[role][role+"_openid"] = user_id;
     
     console.log("call `queryByUser`, filter: ", filter);
     Task.find(filter, (err, task)=>{
@@ -50,7 +74,7 @@ module.exports.queryByUser = (req, res)=>{
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result": task});
+        res.status(200).json({"result": wrapTaskDTO(task)});
     })
 }
 
@@ -86,7 +110,7 @@ module.exports.updateStatus = (req, res)=>{
     }else if(verb == "get" && info["staus"] == 0 && info["hunter"]){ // 领取任务 (之前任务状态必须是0 且必须存在hunter)
         try{
             info["status"] = 1;
-            info["hunter"] = ose.Types.ObjectId(body["hunter"] ? body["hunter"]: null);
+            info["hunter"] = body["hunter"];
         }catch(err){
             res.status(400).json(util.errObj(ErrMsg["format"]));
             return ;
@@ -123,11 +147,11 @@ module.exports.delete = (req, res)=>{
 module.exports.add = (req, res)=>{
     let body = req.body;
     console.log("Add Document: ", body);
-    try{
+/*    try{
         ose.Types.ObjectId(body["publisher"]); // 检查ID合法性
     }catch(err){
         res.status(400).json(util.errObj(err + util.ErrMsg["format"]));
-    }
+    }*/
 
     if( util.isValid(body["publisher"])
         && util.isValid(body["caption"])
@@ -136,20 +160,20 @@ module.exports.add = (req, res)=>{
        ) // && util.isValid(body["endtime"])  => 结束时间可以没有
         {
             let task = new Task({
-                "publisher": ose.Types.ObjectId(body["publisher"]),
+                "publisher": body["publisher"],
                 "caption": body["caption"],
-                "award": body["award"] ? body["award"] : 0,
-                "discription": body["discription"],
+                "award": body["bounty"] ? body["bounty"] : 0,
+                "description": body["description"],
                 "hunter": null,
+                "hiddenMsg": body["hiddenMsg"],
                 "taskloc": body["taskloc"],
                 "endloc": body["endloc"],
-                "endtime": body["endtime"],
+                "endtime": body["date"],
             });
             console.log("Add document: ", task);
             task.save((err)=>{
-                console.log("Save callback", task);
                 if(err){
-                    res.status(400).json(util.errObj(util.ErrMsg["unknown"]));
+                    res.status(400).json(util.errObj(util.ErrMsg["unknown"]+err));
                     return ;
                 }
                     
@@ -157,6 +181,7 @@ module.exports.add = (req, res)=>{
             });
         }
     else{
+        console.log("Missing value", body);
         res.status(400).json(util.errObj(util.ErrMsg["format"]));
     }
 }

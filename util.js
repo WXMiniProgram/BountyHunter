@@ -2,7 +2,7 @@ let request = require("request");
 let config = require("config");
 let appID = "wx750215304d97dc16";
 let appSecret = "864a0f96d62e80fdae679f421587e49d";
-
+const path = require("path");
 
 let ErrMsg = {
     "format": "API调用参数错误。",
@@ -44,7 +44,7 @@ module.exports.StoreFile = (id, suffix, file, func, err_cb)=>{ // type: avatar o
     let type = "." + temp[temp.length - 1];
     let new_name = "" + id + suffix + type;
     // let new_path = "../statics/users/" + new_name;
-    let new_path = path.join(__dirname, "..", "statics", "users", new_name);
+    let new_path = path.join(__dirname, "statics", "users", new_name);
     console.log("new_path", new_path);
     file.mv(new_path, function(err) {
         if (err && err_cb)
