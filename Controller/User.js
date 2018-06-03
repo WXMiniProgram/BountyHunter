@@ -4,15 +4,18 @@ let fs = require("fs");
 let path = require("path");
 
 function wrapDTO(userORM){ // 我就是闲的
+    console.log("wraping... :==============", userORM);
     let user = {
         "openid": userORM.openid,
         "username": userORM.username,
         "name":userORM.name,
-        "verify": userORM.verify,
+        "verify": userORM.verifyed,
         "school": userORM.school,
         "school_id": userORM.school_id,
         "avatar": userORM.avatar, // 已配置了静态资源，可直接访问该地址拿到文件
-        "img": util.MyServer + userORM.img
+        "img": util.MyServer + userORM.img,
+        "published": userORM.published.amount,
+        "hunted": userORM.hunted.amount
     }
     return user;
 }

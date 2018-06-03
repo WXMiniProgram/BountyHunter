@@ -1,21 +1,35 @@
 let ose = require("mongoose");
 let Task = require("../Model/TaskORM");
+let User = require("../Model/UserORM");
 let util = require("../util");
 
 function wrapTaskDTO(task){
-    if(typeof task == typeof []){}
-    else if(typeof task == typeof {}){}
+//    console.log("length", task.length);
+    if(task.length){
+        let dtos = [];
+        for(let i=0;i<task.length;i++){
+//            console.log(task[i]);
+            dtos.push(wrapTaskDTO(task[i]));
+//            dtos.push(wrapTaskDTO(t));
+        }
+        return dtos;
+    }
+    else if(typeof task == typeof {}){
+        let dto = {
+            "id": task._id,
+            "caption": task.caption,
+            "bounty": task.award,
+            "endtime": task.endtime,
+            "taskloc": task.taskloc,
+            "description": task.description,
+            "publisher": task.publisher,
+            "hunter": task.hunter,
+            "status": task.status,
+            "hiddenMsg": task.hiddenMsg
+        };       
+        return dto;
+    }
     else return task
-
-    console.log(task)
-    let dto = {};
-    dto["caption"] = task["caption"];
-    dto["bounty"] = task.award;
-    dto["endtime"] = task.endtime;
-    dto["taskloc"] = task.taskloc;
-    dto["description"] = task.description;
-    dto["publisher"] = task.publisher;
-    return dto;
 }
 
 module.exports.queryAll  = (req, res)=>{ // query all infos from all datas
@@ -26,22 +40,17 @@ module.exports.queryAll  = (req, res)=>{ // query all infos from all datas
         option = {};
     if(field == "award"){
         option["award"] = method == "asc"? 1 : -1;
-    }
+ }
     /*if(field == "distance"){
 
     }*/ 
     Task.find().sort(option).exec((err, result)=>{
-        console.log("result： ", result)
+        console.log("result： ", result);
         if(err){
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        r = []
-	console.log(typeof result == typeof []);
-        for( t in result){
-            r.push(wrapTaskDTO(t));
-        }
-        console.log("type:" , typeof result);
+        let r = wrapTaskDTO(result);
         res.status(200).json({"result": r});
     })
 }
@@ -55,7 +64,7 @@ module.exports.queryOne = (req, res)=>{
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result": task}); // 未找到时返回null
+        res.status(200).json({"result": wrapTaskDTO(task)}); // 未找到时返回null
     })
 }
 
@@ -93,7 +102,7 @@ module.exports.update = (req, res)=>{
                 res.status(404).json(util.errObj(util.ErrMsg["404"]));
                 return ;
             }
-            res.status(200).json({"result":result});
+            res.status(200).json({"result": wrapTaskDTO(result)});
         });
     }
 }
@@ -107,16 +116,16 @@ module.exports.updateStatus = (req, res)=>{
     if(verb == "cancel"){ // 撤销
         info["status"] = 0; // 更改状态
         info["hunter"] = null;
-    }else if(verb == "get" && info["staus"] == 0 && info["hunter"]){ // 领取任务 (之前任务状态必须是0 且必须存在hunter)
+    }else if(verb == "get"&& body["status"] && body["hunter"]){ // 领取任务 (之前任务状态必须是0 且必须存在hunter)
         try{
-            info["status"] = 1;
+            info["status"] = 3;
             info["hunter"] = body["hunter"];
         }catch(err){
             res.status(400).json(util.errObj(ErrMsg["format"]));
             return ;
         }
     }else if(verb == "done"){ // 确认完成
-        info["status"] = 2;
+        info["status"] = 4;
     }else{
         res.status(400).json(util.errObj(util.ErrMsg["format"]));
         return ;
@@ -127,7 +136,12 @@ module.exports.updateStatus = (req, res)=>{
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result":result});
+        res.status(200).json({"result": wrapTaskDTO(result)});
+    });
+    User.find({"openid": body["hunter"]["hunter_openid"]}, (err, users)=>{
+        let user = users[0];
+        user.hunted.amount +=1;
+        user.save();
     });
 }
 
@@ -140,7 +154,7 @@ module.exports.delete = (req, res)=>{
             return ;
         }
            
-        res.status(200).json({"result": result});
+        res.status(200).json({"result": wrapTaskDTO(result)});
     })
 }
 
@@ -177,8 +191,14 @@ module.exports.add = (req, res)=>{
                     return ;
                 }
                     
-                res.status(200).json({"result": task});
+                res.status(200).json({"result": wrapTaskDTO(task)});
             });
+            let publisher_openid = body["publisher"]["publisher_openid"]
+            User.find({"openid": publisher_openid}, (err, users)=>{
+                let u = users[0];
+                u.published.amount +=1;
+                u.save();
+            })
         }
     else{
         console.log("Missing value", body);

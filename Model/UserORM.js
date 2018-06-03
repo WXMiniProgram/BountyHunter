@@ -33,6 +33,16 @@ let UserScema = new ose.Schema({
     img:{ // 认证图片
         type:String,
         default: ""
+    },
+    published: {
+        amount: {
+            type: Number
+        }
+    },
+    hunted: {
+        amount: {
+            type: Number
+        }
     }
 });
 
