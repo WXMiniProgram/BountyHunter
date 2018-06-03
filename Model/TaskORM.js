@@ -62,7 +62,7 @@ let TaskSchema = new ose.Schema({ // ID 自动设置了 类型为mongo的ObjectI
     endtime:{
         type: Date
     },
-    status:{ // 0:未完成 1:正在执行 2:已完成
+    status:{ // -1: 取消 0:未完成 3:正在执行 4:已完成
         type: Number,
         default: 0
     }

@@ -4,7 +4,7 @@ let fs = require("fs");
 let path = require("path");
 
 function wrapDTO(userORM){ // 我就是闲的
-    console.log("wraping... :==============", userORM);
+//    console.log("wraping... :==============", userORM);
     let user = {
         "openid": userORM.openid,
         "username": userORM.username,

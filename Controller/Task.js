@@ -44,7 +44,7 @@ module.exports.queryAll  = (req, res)=>{ // query all infos from all datas
     /*if(field == "distance"){
 
     }*/ 
-    Task.find().sort(option).exec((err, result)=>{
+    Task.find({"status": {$gte: 0, $lte:3}}).sort(option).exec((err, result)=>{
         console.log("result： ", result);
         if(err){
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
@@ -71,14 +71,17 @@ module.exports.queryOne = (req, res)=>{
 module.exports.queryByUser = (req, res)=>{
     let params = req.params,
         role = params["as"], // publisher or hunter
-        user_id = params["user_id"],
-        filter = {};
-    filter[role] = {};
-    filter[role][role+"_openid"] = user_id;
-    
-    console.log("call `queryByUser`, filter: ", filter);
+        user_id = params["user_id"];
+    //filter[role] = {};
+    //filter[role][role+"_openid"] = user_id;
+//    console.log(role, user_id, typeof user_id);
+    let key = role=="publisher"? "publisher.publisher_openid" :  "hunter.hunter_openid";    
+   // console.log("call `queryByUser`, filter: ", key, user_id);
+    let filter={};
+    filter[key] = user_id;
+    console.log("filter:", filter);
     Task.find(filter, (err, task)=>{
-        console.log(err, task);
+        console.log(task);
         if(err){
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
@@ -88,12 +91,12 @@ module.exports.queryByUser = (req, res)=>{
 }
 
 module.exports.update = (req, res)=>{
-    console.log("Update! ", req.params);
+//    console.log("Update! ", req.params);
 
     let params = req.params,
     body = req.body,
     id = params["task_id"];
-    if(body["status"] || body["hunter"]){
+    if(body["verb"]){
         this.updateStatus(req, res);
         return ;
     }else{
@@ -113,9 +116,9 @@ module.exports.updateStatus = (req, res)=>{
         task_id = params["task_id"];
     let verb = body["verb"];
     let info = {}
-    if(verb == "cancel"){ // 撤销
-        info["status"] = 0; // 更改状态
-        info["hunter"] = null;
+    if(verb == "cancel"){ // 发布人撤销
+        info["status"] = -1; // 更改状态
+//        info["hunter"] = {};
     }else if(verb == "get"&& body["status"] && body["hunter"]){ // 领取任务 (之前任务状态必须是0 且必须存在hunter)
         try{
             info["status"] = 3;
@@ -127,22 +130,25 @@ module.exports.updateStatus = (req, res)=>{
     }else if(verb == "done"){ // 确认完成
         info["status"] = 4;
     }else{
+//  console.log("wrong verb");
         res.status(400).json(util.errObj(util.ErrMsg["format"]));
         return ;
     }
-
+  //  console.log("info", info);
     Task.findByIdAndUpdate(task_id, info,(err, result)=>{
         if(err){
+                    console.log("DB error:", err);
             res.status(404).json(util.errObj(util.ErrMsg["404"]));
             return ;
         }
-        res.status(200).json({"result": wrapTaskDTO(result)});
+        else 
+            res.status(200).json({"result": wrapTaskDTO(result)});
     });
-    User.find({"openid": body["hunter"]["hunter_openid"]}, (err, users)=>{
+    /*User.find({"openid": body["hunter"]["hunter_openid"]}, (err, users)=>{
         let user = users[0];
         user.hunted.amount +=1;
         user.save();
-    });
+    });*/
 }
 
 module.exports.delete = (req, res)=>{
@@ -160,7 +166,6 @@ module.exports.delete = (req, res)=>{
 
 module.exports.add = (req, res)=>{
     let body = req.body;
-    console.log("Add Document: ", body);
 /*    try{
         ose.Types.ObjectId(body["publisher"]); // 检查ID合法性
     }catch(err){
@@ -205,3 +210,4 @@ module.exports.add = (req, res)=>{
         res.status(400).json(util.errObj(util.ErrMsg["format"]));
     }
 }
+
