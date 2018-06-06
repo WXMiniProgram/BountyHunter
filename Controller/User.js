@@ -84,6 +84,9 @@ module.exports.verify = (req, res)=>{ // 含有头像 认证图片在用户选�
             "school_id": body["school_id"],
             "avatar": body["avatar"] // 既然路径是固定的 那么只存名字就可以了
         }
+        if(! util.isValid(body["username"]) || !util.isValid(body["name"]) ||!util.isValid(body["school"]) ||!util.isValid(body["school_id"]) || !util.isValid(body["avatar"])){
+             res.status(400).json(util.errObj(util.ErrMsg["format"]));
+        }else{
         User.find({"openid":openid}, (err, users)=>{
            let user = users[0];
            if(err || !util.isValid(user)){
@@ -97,6 +100,7 @@ module.exports.verify = (req, res)=>{ // 含有头像 认证图片在用户选�
            user.save(); 
            res.status(200).json({"result": wrapDTO(user)});
         })
+        }
    // },
    //     (err)=>{
    //         console.log("error?:", err);
