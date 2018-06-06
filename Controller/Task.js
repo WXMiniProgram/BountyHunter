@@ -54,6 +54,22 @@ module.exports.queryByUser = (req, res)=>{
     })
 }
 
+module.exports.queryUndoneByUser = (req, res)=>{
+    let params = req.params;
+    let role = params["as"],
+        id = params["user_id"];
+    let filter = {"status": 1};
+    role = role == "publisher"?"publisher.publisher_openid":"hunter.hunter_openid";
+    filter[role] = id;
+    Task.count(filter, (err, c)=>{
+        if(err){
+            res.status(404).json(util.errObj(util.ErrMsg["404"]));
+            return ;
+        }
+        res.status(200).json({"amount": c});
+    })
+}
+
 module.exports.update = (req, res)=>{
     console.log("Update! ", req.params);
 

@@ -13,6 +13,7 @@ router.get('/tasks', Task.queryAll);
 router.get('/tasks/:orderby.:method', Task.queryAll); // 所有任务(按距离或赏金排序)
 router.get('/tasks/:task_id', Task.queryOne); // 任务详情页
 router.get('/tasks/:as/:user_id', Task.queryByUser); // as hunter or publisher
+router.get('/tasks/amount/:as/:user_id', Task.queryUndoneByUser);
 router.put('/tasks/:task_id', Task.update); // 全部都可更新
 // TODO: PUT 连不上？！
 // router.put('/tasks/:verb/：task_id', Task.updateStatus); // 更新任务：主要被领取、完成 时
