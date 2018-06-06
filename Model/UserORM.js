@@ -2,8 +2,9 @@ let ose = require('mongoose');
 
 
 let UserScema = new ose.Schema({
-    _id:{
-        type: ose.Schema.Types.ObjectId
+    openid: {
+        type: String,
+        default: "",
     },
     username:{
         type:String,
@@ -32,6 +33,16 @@ let UserScema = new ose.Schema({
     img:{ // 认证图片
         type:String,
         default: ""
+    },
+    published: {
+        amount: {
+            type: Number
+        }
+    },
+    hunted: {
+        amount: {
+            type: Number
+        }
     }
 });
 
